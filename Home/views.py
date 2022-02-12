@@ -3,6 +3,8 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 
+from .forms import SignUpForm
+
 # Create your views here.
 
 def index(request):
@@ -19,6 +21,24 @@ def signin(request):
             messages.success(request,f"your are login in as {loginusername}")
             return redirect("/")
         else:
-            messages.error(request,"Invalid Credentionls! Please Try again")
-            return redirect("/")
+            messages.warning(request,"Invalid Credentionls! Please Try again")
+            return redirect("signin")
     return render(request,'Home/signin.html')
+
+def signup(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            return redirect('')
+    else:
+        form = SignUpForm()
+    return render(request, 'Home/signup.html', {'form': form})
+
+def signout(request):
+    logout(request)
+    return redirect('/')
