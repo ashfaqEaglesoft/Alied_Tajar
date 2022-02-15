@@ -3,7 +3,7 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 
-from .forms import SignUpForm
+from .forms import SignUpForm,BusinessForm
 
 # Create your views here.
 
@@ -42,3 +42,20 @@ def signup(request):
 def signout(request):
     logout(request)
     return redirect('/')
+
+# Add products 
+def add_business(request):
+    form = BusinessForm(request.POST or None, request.FILES or None)
+    if request.method=="POST":
+        # check if form data is valid
+        if form.is_valid():
+            # save the form data to model
+            form.save()
+            messages.add_message(request, messages.INFO, 'Products Add in Inventory')
+        else:
+            messages.add_message(request, messages.WARNING, 'Oops! Products did not Add in Inventory')
+    context={
+        "p_form":form,
+    }
+    return render(request,"home/add_business.html",context)
+
